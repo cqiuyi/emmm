@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>跳转中...</title>
+    <style>
+        :root {
+            --primary-color: #00a1d6;
+            --secondary-color: #00a1d6;
+            --dark-color: #222;
+            --light-color: #f8f9fa;
+            --border-radius: 8px;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .countdown {
+            font-size: 18px;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--dark-color);
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .video-toggle {
+            margin-top: 30px;
+        }
+        
+        .toggle-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .toggle-btn:hover {
+            background-color: #0088b7;
+        }
+        
+        .video-container {
+            display: none;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9视频比例，自适应高度 */
+            height: 0;
+            background: #000;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .manual-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .manual-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .manual-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>网页跳转控制</h1>
+        
+        <div class="countdown" id="countdown">
+            5秒后自动跳转...
+        </div>
+        
+        <div class="btn-group">
+            <button id="stop-btn" class="btn btn-secondary">
+                <span></span> 停止跳转
+            </button>
+            <button id="jump-btn" class="btn btn-primary">
+                <span></span> 立即跳转
+            </button>
+        </div>
+    </div>
+    
+    <div class="card video-toggle">
+        <button class="toggle-btn" onclick="toggleVideo()">
+            <span id="toggle-icon">▼</span> 预览视频
+        </button>
+        <div class="video-container" id="videoPreview">
+            <!-- B站视频iframe嵌入代码，bvid替换为目标视频ID -->
+            <iframe src="https://player.bilibili.com/player.html?bvid=BV1GJ411x7h7&autoplay=false" 
+                    width="100%" height="100%" frameborder="0" 
+                    allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // 跳转设置
+        const targetUrl = "https://m.bilibili.com/video/BV1GJ411x7h7";
+        let countdown = 5;
+        let redirectEnabled = true;
+        const countdownElement = document.getElementById('countdown');
+        const stopBtn = document.getElementById('stop-btn');
+        const jumpBtn = document.getElementById('jump-btn');
+        const toggleIcon = document.getElementById('toggle-icon');
+
+        // 倒计时功能
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = `${countdown}秒后自动跳转...`;
+            
+            if (countdown <= 0 && redirectEnabled) {
+                clearInterval(timer);
+                countdownElement.textContent = "正在跳转...";
+                window.location.href = targetUrl;
+            }
+        }, 1000);
+
+        // 停止跳转
+        stopBtn.addEventListener('click', () => {
+            redirectEnabled = false;
+            clearInterval(timer);
+            countdownElement.textContent = "跳转已取消";
+            stopBtn.innerHTML = '<span></span> 已取消';
+            stopBtn.style.backgroundColor = "#6c757d";
+        });
+
+        // 立即跳转
+        jumpBtn.addEventListener('click', () => {
+            countdownElement.textContent = "正在跳转...";
+            window.location.href = targetUrl;
+        });
+
+        // 折叠菜单功能
+        function toggleVideo() {
+            const videoContainer = document.getElementById('videoPreview');
+            
+            if (videoContainer.style.display === 'block') {
+                videoContainer.style.display = 'none';
+                toggleIcon.textContent = '▼';
+            } else {
+                videoContainer.style.display = 'block';
+                toggleIcon.textContent = '▲';
+            }
+        }
+    </script>
+</body>
+</html>
